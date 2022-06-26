@@ -1,4 +1,7 @@
-#lang scheme
+#!r6rs
+(import (rnrs lists (6))
+        (rnrs base (6))
+        (rnrs io simple (6)))
 (define pi 3.14159)
 (define radius 10)
 (* pi (* radius radius))
@@ -119,3 +122,4 @@ x
 ;; (fact-iter 120 6 6)
 ;; (fact-iter 720 7 6)
 ;; 720
+(atom? (quote ()))
