@@ -79,8 +79,43 @@ x
 (test 0 (p))
 ;; (test 0 )
 ;; test
-(define (sqrt x)
-  (the y (and (>= y 0) (= (square y) x))))
+;; (sqrt 12)
+; -- Linear recursive process of factorial
+(define (factorial n)
+  (if (= n 0) 1 (* n (factorial (- n 1)))))
 
-(sqrt 12)
+;; (factorial 6)
+;; (* 6 (factorial 5))
+;; (* 6 (* 5 (factorial 4)))
+;; (* 6 (* 5 (* 4 (factorial 3))))
+;; (* 6 (* 5 (* 4 (* 3 (factorial 2)))))
+;; (* 6 (* 5 (* 4 (* 3 (* 2 (factorial 1))))))
+;; (* 6 (* 5 (* 4 (* 3 (* 2 1)))))
+;; (* 6 (* 5 (* 4 (* 3 2))))
+;; (* 6 (* 5 (* 4 6)))
+;; (* 6 (* 5 24))
+;; (* 6 120)
+;; 720
 
+; A linear iterative process for computing factorial
+
+(define (factorial_iter n)
+  (fact-iter 1 1 n))
+
+(define (fact-iter product counter max-count)
+  (if (> counter max-count) product (fact-iter (* counter product) (+ counter 1) max-count)))
+
+;; better way
+(define (factorial_iter_better n)
+  (define (iter product counter)
+    (if (> counter n) product (iter (* counter product) (+ counter 1))))
+  (iter 1 1))
+;; (factorial 6)
+;; (fact-iter 1 1 6)
+;; (fact-iter 1 2 6)
+;; (fact-iter 2 3 6)
+;; (fact-iter 6 4 6)
+;; (fact-iter 24 5 6)
+;; (fact-iter 120 6 6)
+;; (fact-iter 720 7 6)
+;; 720
