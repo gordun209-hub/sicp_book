@@ -43,7 +43,7 @@
       [(null? l) #t] ; check if null
       ; if not null take first element and check if atom if not
       ; call same function with cdr l which drops first and takes rest
-      [(atom?  (car l)) (lat? (cdr l))]
+      [(atom? (car l)) (lat? (cdr l))]
       [else #f])))
 
 (lat? '(bacon and eggs))
@@ -57,18 +57,26 @@
       [else (or (eq? (car lat) a) (member? a (cdr lat)))])))
 (member? 'meat '(mashed potatoes and meat gravy))
 
-
 ; The first commandment
 ; Always ask null? as the first question in expressing any function
-
+;; wrong implementation
+;; (define rember
+;;   (lambda (a lat)
+;;     (cond
+;;       [(null? lat) (quote ())]
+;;       [else
+;;        (cond
+;;          [(eq? (car lat) a) (cdr lat)]
+;;          [else (rember a (cdr lat))])])))
 
 
 (define rember
   (lambda (a lat)
     (cond
       ((null? lat) (quote ()))
-       (else (cond
-               ((eq? (car lat) a) (cdr lat))
-                (else (rember a
-                              (cdr lat))))))))
+      (else (cond
+              ((eq? (car lat) a) (cdr lat))
+              (else (cons (car lat)
+                          (rember a
+                                  (cdr lat)))))))))
 
