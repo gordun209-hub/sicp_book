@@ -80,3 +80,95 @@
                           (rember a
                                   (cdr lat)))))))))
 
+(define rember_but_clearer
+  (lambda (a lat)
+    (cond
+      ; null ise quote
+      ((null? lat )(quote()))
+      ; car lat a esit ise (firs item in list) return cdr lat
+      ((eq? (car lat) a) (cdr lat))
+      ; else const first list item and recur rember
+      (else (cons (car lat)
+                  (rember a (cdr lat)))))))
+
+
+(define insertRs
+  (lambda (new old lat)
+    (cond
+      ((null? lat) (quote()))
+      (else
+       (cond
+         ((eq? (car lat) old) (cons new (cdr lat)))
+         (else (cons (car lat)
+                     (insertR new old (cdr lat)))))))))
+(define insertR
+  (lambda (new old lat)
+    (cond
+      ((null? lat) (quote ()))
+      (else (cond
+              ((eq? (car lat) old)
+               (cons old
+                     (cons new (cdr lat))))
+              (else (cons (car lat)
+                          (insertR new old
+                                   (cdr lat)))))))))
+
+(define insertL
+  (lambda (new old lat)
+    (cond
+      ((null? lat) (quote ()))
+      (else (cond
+              ((eq? (car lat) old)
+               (cons new lat))
+              (else (cons (car lat)
+                          (insertL new old (cdr lat)))))))))
+
+(insertR 'laa 'eski '(mk eski yeni la))
+
+(insertL 'laa 'eski '(mk eski yeni la))
+
+(define subst
+  (lambda (new old lat)
+    (cond
+      ((null? lat) (quote()))
+      (else (cond
+              ((eq? (car lat) old)
+               (cons new (cdr lat)))
+              (else (cons (car lat) (subst new old (cdr lat)))))))))
+
+(define subst2
+  (lambda (new o1 o2 lat)
+    (cond
+      ((null? lat) (quote ()))
+      (else (cond
+              ((or (eq? (car lat) o1) (eq? (car lat) o2))
+               (cons new (cdr lat)))
+              (else (cons (car lat)
+                          (subst2 new o1 o2 (cdr lat)))))))))
+
+(define multirember
+  (lambda (a lat)
+    (cond
+      ((null? lat) (quote()))
+      (else
+       (cond
+         ((eq? (car lat) a)
+          (multirember a (cdr lat)))
+         (else (cons (car lat)
+                     (multirember a
+                                  (cdr lat)))))))))
+
+(define multiinsertL
+  (lambda (new old lat)
+    (cond
+      ((null? lat) (quote ()))
+      (else
+       (cond
+         ((eq? (car lat) old)
+          (cons new
+                (cons old
+                      (multiinsertL new old
+                                    lat))))
+         (else (cons (car lat)
+                     (multiinsertL new old
+                                   (cdr lat)))))))))
