@@ -95,4 +95,4 @@
   (display " *** ")
   (display elapsed-time))
 
-(timed-prime-test 22)
+
