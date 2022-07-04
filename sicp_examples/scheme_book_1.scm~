@@ -41,8 +41,9 @@
     (+ new-x new-x))) ; => 4
 
 (let ((x 9))
-  (* x (let ((x (/ x 3)))
-         (+ x x)))) ; => 54
+  (* x
+     (let ((x (/ x 3)))
+       (+ x x)))) ; => 54
 
 ((lambda (x) (+ x x)) (* 3 4)) ; => 24
 ; (lambda (var ...) exp1 exp2 ...)
@@ -51,43 +52,5 @@
   (list (double (* 3 4))
         (double (/ 99 11))
         (double (- 2 7)))) ; => (24 18 -10)
-(let ((double-cons (lambda (x) (cons x x))))
-  (double-cons 'a))
 
 
-(let ((double-any (lambda (f x) (f x x))))
-  (list (double-any + 13)
-        (double-any cons 'a)))
-(let ((x 'a))
-  (let ((f (lambda (y) (list x y))))
-    (f 'b)))
-
-
-(define rember
-  (lambda (a lat)
-    (cond
-      ((null? lat) (quote ()))
-      (else (cond
-              ((eq? (car lat) a) (cdr lat))
-              (else (cons (car lat)
-                          (rember a
-                                  cdr lat))))))))
-
-(define betterRember
-  (lambda (a lat)
-    (cond
-      ((null? lat) (quote()))
-      ((eq? (car lat) a) (cdr lat))
-      (else (cons (car lat)
-                  (rember a (cdr lat)))))))
-
-(define insertR
-  (lambda (new old lat)
-    (cond
-      ((null? lat) (quote ()))
-      (else (cond
-              ((eq? (car lat) old)  ; | -> if first item in list eq old
-               (cons old(cons new (cdr lat)))) ; | -> insert new one
-              (else (cons (car lat)
-                          (insertR new old
-                                   (cdr lat)))))))))
