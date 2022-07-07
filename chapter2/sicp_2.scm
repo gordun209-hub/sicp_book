@@ -47,7 +47,7 @@
 (print-rat (add-rat one-half one-third))
 
 (print-rat (mul-rat one-half one-third))
-   (print-rat (add-rat one-third one-third))
+(print-rat (add-rat one-third one-third))
 
 ; --------------------- exc 2.2
 ;; Consider the problem of representing line
@@ -219,3 +219,8 @@
     [(null? x) 0]
     [(not (pair? x)) 1]
     [else (+ (count-leaves (car x)) (count-leaves (cdr x)))]))
+
+
+
+
+
