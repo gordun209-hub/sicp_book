@@ -100,13 +100,13 @@
 (define (square x) (* x x))
 
 (define (square-list-2 items)
-    (if (null? (cdr items))
-        items
-        (append (square-list-2 (cdr items))
-         (cons (* (car items) (car items)) nil))))
+  (if (null? (cdr items))
+      items
+      (append (square-list-2 (cdr items))
+              (cons (* (car items) (car items)) nil))))
 
 
-(square-list-2 '(2 5 6 22))
+;; (square-list-2 '(2 5 6 22))
 (define (different-reverse items)
   (if (null? (cdr items))
       items
@@ -133,14 +133,6 @@
         (iter (cdr l) (lambda (x) (pick (cons r x))))))
   (iter items (lambda (x) x)))
 
-
-(define (reverse items)
-  (define (iter items result)
-    (if (null? items)
-        result
-        (iter (cdr items) (cons (car items) result))))
-  (iter items nil))
-
 ; (reverse '(2 5 3))
 ;(apend (reverse (5 3)) (cons 2 nil))
 ;(append (reverse (3)) (cons 5 nil) (cons 2 nil))
@@ -154,6 +146,28 @@
     (else (+
            (count-leaves (car x))
            (count-leaves (cdr x))))))
+
+
+(define (reverse items)
+  (define (iter items result)
+    (if (null? items)
+        result
+        (iter (cdr items) (cons (car items) result))))
+  (iter items nil))
+
+;; (define reverse-tree
+;;   (lambda (items)
+;;     (cond
+;;       ((null? items)
+;;        '())
+;;       ((not (pair? (car items)))
+;;        (list (car items)))
+;;       (else (cons
+;;              (reverse-tree (car items))
+;;              (reverse-tree (cdr items)))))))
+;; (define x (list (list 1 2) (list 3 4)))
+;; (reverse-tree x)
+
 
 ; itrerative solution
 (define (i-reverse l)
@@ -170,5 +184,126 @@
       (append (r-reverse (cdr lat)) (list (car lat)))))
 
 
+(define x (list (list 1 2) (list 3 (list 4 5))))
+
+(define (reverse-tree items)
+  (define (rev-imp items result)
+    (if (null? items)
+        result
+        (rev-imp (cdr items) (cons (car items) result))))
+  (rev-imp items nil))
+
+(reverse-tree x)
+
+(define (deep-reverse items)
+  (define (deep-rev-imp items result)
+    (if (null? items)
+        result
+        (let ((first (car items)))
+          (deep-rev-imp (cdr items)
+                        (cons (if (not (pair? first))
+                                  first
+                                  ; call it again if pair
+                                  (deep-reverse first))
+                              result)))))
+  (deep-rev-imp items nil))
+
+(deep-reverse x)
+
+(define (deep-reverse-2 items)
+  (define (deep-rev-if-required item)
+    (if (not (pair? item))
+        item
+        (deep-reverse-2 item)))
+  (define (deep-rev-imp items result)
+    (if (null? items)
+        result
+        (deep-rev-imp (cdr items)
+                      (cons (deep-rev-if-required (car items))
+                            result))))
+  (deep-rev-imp items nil))
+
+(deep-reverse-2 x)
 
 
+(define (eli-deep-reverse lst)
+  (cond ((null? lst) nil)
+        ((pair? (car lst))
+         (append
+          (eli-deep-reverse (cdr lst))
+          (list (eli-deep-reverse (car lst)))))
+        (else
+         (append
+          (eli-deep-reverse (cdr lst))
+          (list (car lst))))))
+
+(eli-deep-reverse x)
+
+
+
+(define (make-mobile left right)
+  (list left right))
+(define (left-branch mobile)
+  (car mobile))
+(define (right-branch mobile)
+  (car (cdr mobile)))
+
+(define (make-branch length structure)
+  (list length structure))
+
+(define (branch-length branch)
+  (car branch))
+(define (branch-structure branch)
+  (car (cdr branch)))
+
+;; Finding the total weight of a binary mobile
+;; Using wishful thinking to recurse the addition of left-branch and right-branch mobiles
+
+(define (total-weight mobile)
+  (cond ((null? mobile) 0)
+        ((not (pair? mobile)) mobile)
+        (else (+ (total-weight (branch-structure (left-branch mobile)))
+                 (total-weight (branch-structure (right-branch mobile)))))))
+
+;; Test
+(define a (make-mobile (make-branch 2 3) (make-branch 2 3)))
+(total-weight a) ;; 6
+
+(define (torque branch)
+  (* (branch-length branch) (total-weight (branch-structure branch))))
+
+;; Finally to check if the torques of both sides are equal
+;; And if the sub-mobiles are balanced using recursion
+
+(define (balanced? mobile)
+  (if (not (pair? mobile))
+      true
+      (and (= (torque (left-branch mobile)) (torque (right-branch mobile)))
+           (balanced? (branch-structure (left-branch mobile)))
+           (balanced? (branch-structure (right-branch mobile))))))
+
+;; Test
+
+(define d (make-mobile (make-branch 10 a) (make-branch 12 5)))
+;; Looks like: ((10 ((2 3) (2 3))) (12 5))
+
+(balanced? d) ;; #t
+
+(define (square-tree tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (square-tree sub-tree)
+             (* sub-tree sub-tree)))tree))
+
+(square-tree (list 1 
+                   (list 2 (list 3 4) 5)
+                   (list 6 7)))
+
+
+(define (subsets s)
+  (if (null? s)
+    (list nil)
+    (let ((rest (subsets (cdr s))))
+      (append rest (map (lambda (x) (cons (car s) x)) rest)))))
+
+(subsets (list 1 2 3))
