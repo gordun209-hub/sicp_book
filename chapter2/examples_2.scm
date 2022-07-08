@@ -29,7 +29,7 @@
 
 
 
-(same-parity 2 4 5 6 7)
+;; (same-parity 2 4 5 6 7)
 
 (define (sam-parity first . rest)
   (define (inter yes? lat)
@@ -77,9 +77,9 @@
       (cons (proc (car items))
             (map proc (cdr items)))))
 
-(map abs (list -10 2.5 -11.6 17))
+;; (map abs (list -10 2.5 -11.6 17))
 
-((lambda (x) (* x x)) 2)
+;; ((lambda (x) (* x x)) 2)
 
 (define (scale-list items factor)
   (map (lambda (x) (* x factor))
@@ -90,32 +90,38 @@
       nil
       (cons (* (car items) (car items)) (square-list (cdr items)))))
 
-(square-list (list 2 3 4))
+;; (square-list (list 2 3 4))
 
 (define suqare-with-lambda
   (lambda (items)
     (map (lambda (x) (* x x)) items)))
-(suqare-with-lambda (list 2 3 4))
+;; (suqare-with-lambda (list 2 3 4))
 
 (define (square x) (* x x))
 
 (define (square-list-2 items)
-  (define (iter things answer)
-    (if (null? things)
-        answer
-        (iter (cdr things)
-              (cons (square (car things))
-                    (cdr (answer))))))
-  (iter items nil))
+    (if (null? (cdr items))
+        items
+        (append (square-list-2 (cdr items))
+         (cons (* (car items) (car items)) nil))))
 
-(square-list-2 '(5 2 4))
+
+(square-list-2 '(2 5 6 22))
+(define (different-reverse items)
+  (if (null? (cdr items))
+      items
+      (append (different-reverse (cdr items))
+              (cons (car items) nil))))
+
+
+;; (square-list-2 '(5 2 4))
 
 ; (iter '(5 2 4) nil)
 ; (iter (2 4) (cons (square (5)) nil))
 ; (iter (2 4) (25)
-(cons (square (car '(5 2 4))) nil) ; => 25
+;; (cons (square (car '(5 2 4))) nil) ; => 25
 ; (iter (4) (cons (square 2) (25)))
-(append (list 25) (square (car (list 2 3))))
+;; (append (list 25) (square (car (list 2 3))))
 ;(cons (square 2) '(25)) ; => (4 25)
 
 
@@ -135,12 +141,11 @@
         (iter (cdr items) (cons (car items) result))))
   (iter items nil))
 
-(define (different-reverse items)
-  (if (null? (cdr items))
-      items
-      (append (reverse (cdr items))
-              (cons (car items) nil))))
-
+; (reverse '(2 5 3))
+;(apend (reverse (5 3)) (cons 2 nil))
+;(append (reverse (3)) (cons 5 nil) (cons 2 nil))
+;(append (reverse ()) (cons 3 nil) (cons 5 nil) (cons 2 nil))
+;; (append '() (cons 3 nil) (cons 5 nil) (cons 2 nil))
 
 (define (count-leaves x)
   (cond
@@ -149,4 +154,21 @@
     (else (+
            (count-leaves (car x))
            (count-leaves (cdr x))))))
+
+; itrerative solution
+(define (i-reverse l)
+  (define (it-rev lat ans)
+    (if (null? lat)
+        ans
+        (it-rev (cdr lat) (cons (car lat) ans))))
+  (it-rev l '()))
+
+;recursive solution
+(define (r-reverse lat)
+  (if (null? lat)
+      '()
+      (append (r-reverse (cdr lat)) (list (car lat)))))
+
+
+
 
