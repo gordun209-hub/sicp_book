@@ -1,4 +1,5 @@
 #lang racket/base
+; TODO burayi anla
 (require racket/trace)
 (require errortrace)
 (define (filter predicate sequence)
@@ -103,16 +104,16 @@
 ;; (7 8 9) (10 11 12)), then the value of (accumulate-n +
 ;; 0 s) should be the sequence (22 26 30). Fill in the missing
 ;; expressions in the following definition of accumulate-n:
-(define t (list (list 1 2 3) (list 40 50 60) (list 700 800 900))) 
+(define t (list (list 1 2 3) (list 40 50 60) (list 700 800 900)))
 
- (define (select-cars sequence) 
-   (map car sequence)) 
-  
- (define (select-cdrs sequence) 
-   (map cdr sequence)) 
+(define (select-cars sequence)
+  (map car sequence))
 
- (select-cars t) 
- (select-cdrs t)
+(define (select-cdrs sequence)
+  (map cdr sequence))
+
+(select-cars t)
+(select-cdrs t)
 ; 891982389123 IQ movement
 (define (accumulate-n op init seqs)
   (if (null? (car seqs))
@@ -120,4 +121,69 @@
       (cons (accumulate op init (map car seqs))
             (accumulate-n op init (map cdr seqs)))))
 
- (accumulate-n + 0 t)
+(accumulate-n + 0 t)
+
+; (dot-product v w) returns the sum
+; (matrix-*-vector m v) returns vector t where
+
+(define (dot-product v w)
+  (accumulate + 0 (map * v w)))
+
+(define (matrix-*-vector m v)
+  (map (lambda (w)
+         (dot-product v w)) m))
+
+(define (transpose m)
+  (accumulate-n cons '() m))
+
+(define (matrix-*-matrix m n)
+  (let ((cols (transpose n)))
+    (map (lambda (v) (matrix-*-vector cols v)) m)))
+
+(define (fold-left op initial sequence)
+  (define (iter result rest)
+    (if (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter initial sequence))
+(trace fold-left)
+
+(fold-left + 0 (list 1 2 3))
+
+(define n 6)
+(accumulate append null (map (lambda (i)
+                               (map (lambda (j) (list i j))
+                                    (enumerate-interval 1 (- i 1))))
+                             (enumerate-interval 1 n)))
+
+(define (flatmap proc seq)
+  (accumulate append null (map proc seq)))
+
+
+(define (prime? x) (= 1 (remainder x 2)))
+
+(define (prime-sum? pair)
+  (prime? (+ (car pair) (cadr pair))))
+
+(define (make-pair-sum pair)
+  (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
+
+; combine all
+(define (prime-sum-pairs n)
+  (map make-pair-sum
+       (filter prime-sum? (flatmap
+                           (lambda (i)
+                             (map (lambda (j) (list i j))
+                                  (enumerate-interval 1 (- i 1))))
+                           (enumerate-interval 1 n)))))
+
+
+(define (permutations s)
+  (if (null? s)
+      (list null)
+      (flatmap (lambda (x)
+                 (map (lambda (p) (cons x p))
+                      (permutations (remove x s))))
+               s)))
+
