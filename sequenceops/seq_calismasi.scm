@@ -195,3 +195,4 @@
           (unique-tuples n 3)))
 (triples-of-sum 20 30)
 
+; TODO queen  exercise coz
