@@ -3,7 +3,13 @@
 ; HELPERS
 (define (square x) (* x x))
 
-(define (prime? x) (= (remainder x 2)))
+(define (prime? x)
+  (define (test divisor)
+    (cond ((> (* divisor divisor) x) #t)
+          ((= 0 (remainder x divisor)) #f)
+          (else (test (+ divisor 1)))))
+  (test 2))
+
 
 (define (fib n)
   (if (<= n 2)
@@ -143,3 +149,49 @@
                                   (enumerate-interval 1 (- i 1))))
                            (enumerate-interval 1 n)))))
 ; TODO analmadm TODO
+
+(define (permutations s)
+  (if (null? s)
+      (list null)
+      (flatmap (lambda (x)
+                 (map (lambda (p) (cons x p))
+                      (permutations (remove x s))))
+               s)))
+
+
+;; Exercise 2.40: Define a procedure unique-pairs that, given
+;; an integer n, generates the sequence of pairs (i, j) with 1 ≤
+;; j < i ≤ n. Use unique-pairs to simplify the definition of
+;; prime-sum-pairs given above.
+
+
+(define (unique-pairs n)
+  (flatmap (lambda (i)
+             (map (lambda (j) (list i j))
+                  (enumerate-interval 1 (- i 1))))
+           (enumerate-interval 1 n)))
+
+
+(define (prime-sum-pairss n )
+  (map (make-pair-sum
+        (filter prime-sum? (unique-pairs n)))))
+
+;; Exercise 2.41: Write a procedure to find all ordered triples
+;; of distinct positive integers i, j, and k less than or equal to
+;; a given integer n that sum to a given integer s
+
+; ANLAMADIM WTF TODO ANLAMAYA CALS TODO TODO
+; k-tuples of [1..n]
+(define (unique-tuples n k)
+  (cond ((< n k) null)
+        ((= k 0) (list null))
+        (else (append (unique-tuples (- n 1) k)
+                      (map (lambda (tuple) (cons n tuple))
+                           (unique-tuples (- n 1) (- k 1)))))))
+
+; application to the case of 3-tuples
+(define (triples-of-sum s n)
+  (filter (lambda (seq) (= (accumulate + 0 seq) s))
+          (unique-tuples n 3)))
+(triples-of-sum 20 30)
+
