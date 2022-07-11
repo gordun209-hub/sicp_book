@@ -21,7 +21,7 @@
   (accumulate cons
               list2
               list1))
-(trace my-append)
+;; (trace my-append)
 ;; (my-append '(2 3 4) '(5 6))
 ;op   'initial sequence
 ; (accumulate cons '(5 6) '(2 3 4))
@@ -56,7 +56,7 @@
 
 ;; (sum-odd-squares (list 1 (list 2 3) 4 (list 5 6)))
 
-
+; TODO
 (define (my-map proc sequence)
   (accumulate (lambda (first already-accumulated)
                 (cons (proc first) already-accumulated))
@@ -75,7 +75,7 @@
               0
               coefficient-sequence))
 
-(horner-eval 2 (list  1 3 0 5 0 1))
+;; (horner-eval 2 (list  1 3 0 5 0 1))
 
 (define (count-leaves t)
   (accumulate + 0 (map (lambda (node)
@@ -112,8 +112,8 @@
 (define (select-cdrs sequence)
   (map cdr sequence))
 
-(select-cars t)
-(select-cdrs t)
+;; (select-cars t)
+;; (select-cdrs t)
 ; 891982389123 IQ movement
 (define (accumulate-n op init seqs)
   (if (null? (car seqs))
@@ -121,7 +121,7 @@
       (cons (accumulate op init (map car seqs))
             (accumulate-n op init (map cdr seqs)))))
 
-(accumulate-n + 0 t)
+;; (accumulate-n + 0 t)
 
 ; (dot-product v w) returns the sum
 ; (matrix-*-vector m v) returns vector t where
@@ -147,15 +147,15 @@
         (iter (op result (car rest))
               (cdr rest))))
   (iter initial sequence))
-(trace fold-left)
+;; (trace fold-left)
 
-(fold-left + 0 (list 1 2 3))
+;; (fold-left + 0 (list 1 2 3))
 
-(define n 6)
-(accumulate append null (map (lambda (i)
-                               (map (lambda (j) (list i j))
-                                    (enumerate-interval 1 (- i 1))))
-                             (enumerate-interval 1 n)))
+;; (define n 6)
+;; (accumulate append null (map (lambda (i)
+;;                                (map (lambda (j) (list i j))
+;;                                     (enumerate-interval 1 (- i 1))))
+;;                              (enumerate-interval 1 n)))
 
 (define (flatmap proc seq)
   (accumulate append null (map proc seq)))
@@ -169,15 +169,19 @@
 (define (make-pair-sum pair)
   (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
 
-; combine all
+; combine all TODO
 (define (prime-sum-pairs n)
   (map make-pair-sum
        (filter prime-sum? (flatmap
                            (lambda (i)
-                             (map (lambda (j) (list i j))
+                             (map (lambda (j)
+                                    (newline)
+                                    (display i)
+                                    (display j) (list i j))
+                                  ; enumerate between i and i minus 1
                                   (enumerate-interval 1 (- i 1))))
                            (enumerate-interval 1 n)))))
-
+;; (prime-sum-pairs 5)
 
 (define (permutations s)
   (if (null? s)
@@ -187,3 +191,10 @@
                       (permutations (remove x s))))
                s)))
 
+
+(define (map-2 p seq)
+  (accumulate (lambda (x y) (cons (p x )y ))
+              null
+              seq))
+
+(map-2 (lambda (x) (+ x x)) (list 1 2 3 4))
