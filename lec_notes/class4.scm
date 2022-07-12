@@ -209,3 +209,5 @@ result
 ;; Stacking Abstractions: Segments
 ;; 10. Implement an abstraction for linesegments, which are defined by a pair 
 ;;of endpoints.
+
+
