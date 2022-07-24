@@ -111,11 +111,11 @@
         (else (error "Unknown type: ANGLE" z))))
 
 
-(define (make-from-real-imag x y)
-  (make-from-real-imag-rectangular x y))
-
-(define (make-from-mag-ang r a)
-  (make-from-mag-ang-polar r a))
+;; (define (make-from-real-imag x y)
+;;   (make-from-real-imag-rectangular x y))
+;;
+;; (define (make-from-mag-ang r a)
+;;   (make-from-mag-ang-polar r a))
 
 
 ; ozet
@@ -125,15 +125,16 @@
 ; Polar : real-part-polar, imag-part-polar, magnitude-polar, angle-polar
 ; Rectangular: real-part-rectangular, imag-part-rectangular,
 ; magnitude-rectangular, angle-rectangular
+
 ; Operations
-(define (real-part z ) (car z ))
-(define (imag-part z ) (cdr z))
-(define (magnitude z)
-  (sqrt (+ (square (real-part z))
-           (square (imag-part z)))))
-(define (angle z)
-  ; angle of complex number equals to arctan of ima-part z and real-part z
-  (atan (imag-part z) (real-part z)))
+;; (define (real-part z ) (car z ))
+;; (define (imag-part z ) (cdr z))
+;; (define (magnitude z)
+;;   (sqrt (+ (square (real-part z))
+;;            (square (imag-part z)))))
+;; (define (angle z)
+;;   ; angle of complex number equals to arctan of ima-part z and real-part z
+;;   (atan (imag-part z) (real-part z)))
 
 ; Polar type
 (define (real-part-polar z)
@@ -258,18 +259,49 @@
   'done)
 
 (define (apply-generic op . args)
+  ; type-tags = map type-tag to args
   (let ((type-tags (map type-tag args)))
+    ;; procedure eq get op from type-tags
     (let ((proc (get op type-tags)))
       (if proc
           (apply proc (map contents args))
           (error "No method for these types: APPLY-GENERIC"
                  (list op type-tags))))))
 
+(define (real-part z) (apply-generic 'real-part z))
+(define (imag-part z) (apply-generic 'imag-part z))
+(define (magnitude z) (apply-generic 'magnitude z))
+(define (angle z) (apply-generic 'angle z))
 
 
+(define (make-from-real-imag x y)
+  ((get 'make-from-real-imag 'rectangular) x y))
 
 
+(define (make-from-mag-ang r a)
+  ((get 'make-from-mag-ang 'polar) r a))
 
 
+(define (make-from-mag-ang-msg r a)
+  (define (dispatch op)
+    (cond ((eq? op 'real-part) (* r (cos a)))
+          ((eq? op 'imag-part) (* r (sin a)))
+          ((eq? op 'magnitude) r)
+          ((eq? op 'angle) a)
+          (else (error "Unkown op --- MAKE-FROM-MAG-ANG" op))))
+  dispatch)
 
+;; Exercise 2.75: Implement the constructor make-from-mag-
+;; ang in message-passing style. is procedure should be anal-
+;; ogous to the make-from-real-imag procedure given above.
 
+;; Exercise 2.76: As a large system with generic operations
+;; evolves, new types of data objects or new operations may
+;; be needed. For each of the three strategies—generic opera-
+;; tions with explicit dispatch, data-directed style, and message-
+;; passing-style—describe the changes that must be made to a
+;; system in order to add new types or new operations. Which
+;; organization would be most appropriate for a system in
+;; which new types must oen be added? Which would be
+;; most appropriate for a system in which new operations
+;; must oen be added?
