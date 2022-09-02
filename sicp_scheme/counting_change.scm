@@ -4,8 +4,13 @@
   (cc amount 5))
 
 (define (cc amount kinds-of-coins)
+  ;; if amount down to zero, that means we can use that combination so 1
   (cond ((= amount 0) 1)
+        ;; if amount is less than zero or coins are finished, return 0 bec 
+        ;; we cant use that combination for change
         ((or (< amount 0) (= kinds-of-coins 0 )) 0)
+        ;; else add the combination of changes without first and 
+        ;; with using first change 
         (else (+ (cc amount
                      (- kinds-of-coins 1))
                  (cc (- amount

@@ -32,10 +32,12 @@
   (cond ((= n 0) 1)
         ((even? n ) (square (fast-expt b (/ n 2))))
         (else (* b (fast-expt b (- n 1))))))
-;; (fast-expt 4 2)
-;; (square (fast-expt 4 1)
-;; (square (* 4 (fast-expt 4 (0))))
-;; (square (* 4 (1)))
+
+; (fast-expt 3 4)
+; (square (fast-expt 3 2)
+; (square (square (fast-expt 3 1)))
+; (square (square (* 3 (fast-expt 3 0))))
+; (square (square 3)
 
 ;; Exercise 1.16
 (define (iter-fast-expt b n)
