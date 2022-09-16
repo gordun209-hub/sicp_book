@@ -136,13 +136,31 @@
          (sicp-eval (first-exp exps) env)
          (eval-sequence (rest-exps exps) env))))
 
+
+;; evaluation of set!
+(define (assignment? exp) (tagged-list? exp 'set!))
+(define (assignment-variable exp) (cadr exp))
+(define (assignment-value exp) (caddr exp))
+
+
 (define (eval-assignment exp env)
   (set-variable-value! (assignment-variable exp)
                        (sicp-eval (assignment-value exp) env)
                        env)
   'ok)
-
+;; evaluation of define
+(define (definition-value exp)
+  (if (symbol? (cadr exp))
+      (caddr exp)
+      (make-lambda (cdadr exp) ; formla
+                   (cddr exp)))) ; body
+(define (definition? exp) (tagged-list? exp 'define))
+(define (definition-variable exp)
+  (if (symbol? (cadr exp))
+      (cadr exp)
+      (caadr exp)))
 (define (eval-definition exp env)
+  ;; bu env e katiyo sanrm bakam bi
   (define-variable! (definition-variable exp)
     (sicp-eval (definition-value exp) env)
     env)
@@ -154,25 +172,17 @@
         ((string? exp) true)
         (else false)))
 (define (variable? exp) (symbol? exp))
+
+;; quotation
 (define (quoted? exp) (tagged-list? exp 'quote))
 (define (text-of-quotation exp) (cadr exp))
+;; selector
 (define (tagged-list? exp tag)
   (if (pair? exp)
       (eq? (car exp) tag)
       false))
-(define (assignment? exp) (tagged-list? exp 'set!))
-(define (assignment-variable exp) (cadr exp))
-(define (assignment-value exp) (caddr exp))
-(define (definition? exp) (tagged-list? exp 'define))
-(define (definition-variable exp)
-  (if (symbol? (cadr exp))
-      (cadr exp)
-      (caadr exp)))
-(define (definition-value exp)
-  (if (symbol? (cadr exp))
-      (caddr exp)
-      (make-lambda (cdadr exp) ; formla
-                   (cddr exp)))) ; body
+
+;; lambda constructor and selectors
 (define (lambda? exp) (tagged-list? exp 'lambda))
 (define (lambda-parameters exp) (cadr exp))
 (define (lambda-body exp) (cddr exp))
@@ -330,11 +340,13 @@
           (error "Too many arguments supplied" vars vals)
           (error "Too few arguments supplied" vars vals))))
 
+;; find bounded variables if exissts
 (define (lookup-variable-value var env)
   (define (env-loop env)
     (define (scan vars vals)
       (cond ((null? vars)
              (env-loop (enclosing-environment env)))
+            ;; bulunca returnla
             ((eq? var (mcar vars)) (mcar vals))
             (else (scan (mcdr vars) (mcdr vals)))))
     (if (eq? env the-empty-environment)
@@ -343,6 +355,7 @@
           (scan (frame-variables frame)
                 (frame-values frame)))))
   (env-loop env))
+;; set! assignment?
 (define (set-variable-value! var val env)
   (define (env-loop env)
     (define (scan vars vals)
@@ -356,7 +369,7 @@
           (scan (frame-variables frame)
                 (frame-values frame)))))
   (env-loop env))
-
+;; definiiton
 (define (define-variable! var val env)
   (let ((frame (first-frame env)))
     (define (scan vars vals)
@@ -366,38 +379,38 @@
             (else (scan (mcdr vars) (mcdr vals)))))
     (scan (frame-variables frame) (frame-values frame))))
 
-; (while <predicate> <body>)
-;; pick while
-(define (while? exp) (tagged-list? exp 'while))
-;; predicate is cadr (second)
-(define (while-predicate exp) (cadr exp))
-;; body is third arg
-(define (while-body exp) (cddr exp))
+;; ; (while <predicate> <body>)
+;; ;; pick while
+;; (define (while? exp) (tagged-list? exp 'while))
+;; ;; predicate is cadr (second)
+;; (define (while-predicate exp) (cadr exp))
+;; ;; body is third arg
+;; (define (while-body exp) (cddr exp))
 
 ;; TODO bunu anlamak lasm
-(define (make-procedure-definition name parameters body)
-  (cons 'define  (cons (cons name parameters) body)))
-(define (make-procedure-application procedure arguments)
-  (cons procedure arguments))
-
-(define (while->combination exp)
-  (define (while->procedure-def procedure-name)
-    (make-procedure-definition
-     procedure-name
-     '()
-     (make-if
-      (while-predicate exp)
-      (sequence->exp
-       (append (while-body exp)
-               (make-procedure-application procedure-name '()))))))
-  ; wrap the procedure definition in a lambda to contrain its scope
-  (make-procedure-application
-   (make-lambda
-    '()
-    (list (while->procedure-def 'while-procedure)
-          (make-procedure-application 'while-procedure '())))
-   '()))
-
+;; (define (make-procedure-definition name parameters body)
+;;   (cons 'define  (cons (cons name parameters) body)))
+;; (define (make-procedure-application procedure arguments)
+;;   (cons procedure arguments))
+;;
+;; (define (while->combination exp)
+;;   (define (while->procedure-def procedure-name)
+;;     (make-procedure-definition
+;;      procedure-name
+;;      '()
+;;      (make-if
+;;       (while-predicate exp)
+;;       (sequence->exp
+;;        (append (while-body exp)
+;;                (make-procedure-application procedure-name '()))))))
+;;   ; wrap the procedure definition in a lambda to contrain its scope
+;;   (make-procedure-application
+;;    (make-lambda
+;;     '()
+;;     (list (while->procedure-def 'while-procedure)
+;;           (make-procedure-application 'while-procedure '())))
+;;    '()))
+;;
 
 ; the whole thing will look like this:
 ;; ((lambda ()
@@ -477,5 +490,5 @@
                      '<procedure-env>))
       (display object)))
 
-(sicp-eval '(* 5 5) the-global-environment)
-(sicp-eval (cons '* (list 5 5)) the-global-environment)
+the-global-environment
+(driver-loop)
