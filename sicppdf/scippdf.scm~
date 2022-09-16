@@ -1,0 +1,10 @@
+#lang sicp
+(define (cons x y)
+  (lambda (msg)
+    (cond ((eq? msg 'CAR) x)
+          ((eq? msg 'CDR) y)
+          ((eq? msg 'PAIR?) #t)
+          (else (error "pair cannot" msg)))))
+
+
+(define lambda λ)
