@@ -1,0 +1,2 @@
+(((false true car cdr cons + - / eq? null?) #f #t (primitive #<procedure:mcar>) (primitive #<procedure:mcdr>) (primitive #<procedure:mcons>) (primitive #<procedure:+>) (primitive #<procedure:->) (primitive #<procedure:/>) (primitive #<procedure:eq?>) (primitive #<procedure:null?>)))
+4
