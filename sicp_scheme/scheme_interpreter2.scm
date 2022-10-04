@@ -3,12 +3,11 @@
 
 (define (sicp-eval exp env)
   (cond ((self-evaluating? exp) exp)
-        ;; variable ise env e bak
-        ;; bulursan returnla
         ((variable? exp) (lookup-variable-value exp env))
         ((quoted? exp) (text-of-quotation exp))
         ((assignment? exp) (eval-assignment exp env))
         ((definition? exp) (eval-definition exp env))
+        ((let? exp) (sicp-eval (let->combination exp) env))
         ((if? exp) (eval-if exp env))
         ((lambda? exp) (make-procedure (lambda-parameters exp)
                                        (lambda-body exp)
@@ -99,6 +98,7 @@
       '()
       (cons (sicp-eval (first-operand exps) env)
             (list-of-values (rest-operands exps) env))))
+
 (define (self-evaluating? exp)
   (cond ((number? exp) true)
         ((string? exp) true)
@@ -181,14 +181,41 @@
 (define (lambda-body exp) (cddr exp))
 (define (make-lambda parameters body)
   (cons 'lambda (cons parameters body)))
+
+
+
+;; let expression
+(define (let? expr) (tagged-list? expr 'let))
+(define (let-vars expr) (map car (cadr expr)))
+(define (let-inits expr) (map cadr (cadr expr)))
+(define (let-body expr) (cddr expr))
+
+(define (let->combination expr)
+  (list (make-lambda (let-vars expr) (let-body expr))
+        (let-inits expr)))
+
+
+;; let* expression
+(define (let*? expr) (tagged-list? expr 'let*))
+(define (let*-body expr) (caddr expr))
+(define (let*-inits expr) (cadr expr))
+(define (let*->nested-lets expr)
+  (let ((inits (let*-inits expr))
+        (body (let*-body expr)))
+    (define (make-lets exprs)
+      (if (null? exprs)
+          body
+          (list 'let (list (car exprs)) (make-lets (cdr exprs)))))
+    (make-lets inits)))
 ;; bu variable degeri bulmak icin env i ariyo
-;; env ve var giriyo error yada val cikiyo
 (define (lookup-variable-value var env)
   (define (env-loop env)
     (define (scan vars vals)
-      (cond ((null? vars)
-             (env-loop (enclosing-environment env)))
-            ((eq? var (car vars)) (car vals))
+      (cond ((null? vars) (env-loop (enclosing-environment env)))
+            ((eq? var (car vars))
+             (if (eq? '*unassigned* (car vals))
+                 (error "Variable Unassigned -- LOOKUP-VARIABLE-VALUE" var)
+                 (car vals)))
             (else (scan (cdr vars) (cdr vals)))))
     (if (eq? env the-empty-environment)
         (error "Unbound variable" var)
@@ -196,6 +223,7 @@
           (scan (frame-variables frame)
                 (frame-values frame)))))
   (env-loop env))
+;; env ve var giriyo error yada val cikiyo
 
 (define (set-variable-value! var val env)
   (define (env-loop env)
@@ -209,6 +237,15 @@
                                                (scan (frame-variables frame)
                                                      (frame-values frame)))))
   (env-loop env))
+
+
+(define (make-let bindings body)
+  (cons 'let (cons bindings body)))
+
+(define (make-assignment var exp)
+  (list 'set! var exp))
+
+
 
 ;; define primitives
 (define primitive-procedures
@@ -282,8 +319,6 @@
       (user-print output)))
   (driver-loop))
 
-;; the-global-environment
-;; (driver-loop)
-
 the-global-environment
 (driver-loop)
+
